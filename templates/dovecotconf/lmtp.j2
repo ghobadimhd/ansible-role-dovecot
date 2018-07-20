@@ -1,0 +1,19 @@
+{% if dovecot_lmtp_service_enable | default(False) %}
+{{ 'LMTP' | comment }}
+protocols = $protocols lmtp
+protocol lmtp {
+	{% if dovecot_sieve_enable %}
+	mail_plugins = $mail_plugins sieve
+	{% endif %}
+	postmaster_address = {{ dovecot_lmtp_postmaster | default('root@localhost')}}
+	
+}
+service lmtp {
+	unix_listener {{ dovecot_lmtp_service_path | default('lmtp') }} {
+		mode = {{ dovecot_lmtp_service_mode | default('660') }}
+		user =  {{ dovecot_lmtp_service_group | default('dovecot') }}
+		group = {{ dovecot_lmtp_service_user | default('dovecot') }}
+	}
+}
+
+{% endif -%}

@@ -1,0 +1,12 @@
+{% if dovecot_quota_grace_enable | default(dovecot_quota_enable) %}
+# QUOTA GRACE
+plugin default_quota_grace {
+	# 10% is the default
+    quota_grace = {{ dovecot_quota_grace_percent | default('10') }}%%
+    quota_status_success = DUNNO
+    quota_status_nouser = DUNNO
+    quota_status_overquota = "552 5.2.2 Mailbox is full"
+}
+
+{% endif %}
+{% endif -%}

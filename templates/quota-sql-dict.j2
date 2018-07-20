@@ -1,0 +1,20 @@
+#jinja2: lstrip_blocks: True
+# ANSIBLE GENERATED
+
+connect = host={{ dovecot_sql_host | default(dovecot_sql_host) }} {% if dovecot_sql_port | default(False) %}
+port={{ dovecot_sql_port | default(dovecot_sql_port) }}
+{%- endif %} dbname={{ dovecot_sql_database | default(dovecot_sql_database) }} user={{ dovecot_sql_user | default(dovecot_sql_user) }} password={{ dovecot_sql_password | default(dovecot_sql_password) }} 
+
+map {
+	pattern = priv/quota/storage
+	table = {{ dovecot_quota_sql_table }}
+	username_field = username
+	value_field = bytes
+
+}
+map {
+	pattern = priv/quota/messages
+	table = {{ dovecot_quota_sql_table }}
+	username_field = username
+	value_field = messages
+}

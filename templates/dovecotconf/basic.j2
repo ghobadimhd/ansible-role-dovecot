@@ -1,0 +1,34 @@
+{{ 'BASIC SETTINGS' | comment }}
+mail_location = mbox:~/Mail:INBOX=/var/mail/%Ln
+disable_plaintext_auth = no
+{% if dovecot_ssl_enable | default(False) %}
+ssl = yes
+ssl_cert = <{{ dovecot_ssl_cert }}
+ssl_key = <{{ dovecot_ssl_key }}
+{% else %}
+ssl = no
+{% endif %}
+
+# NAMESPACES
+namespace inbox {
+	inbox = yes
+	mailbox Drafts {
+		special_use = \Drafts
+	}
+	mailbox Junk {
+		special_use = \Junk
+	}
+	mailbox Trash {
+		special_use = \Trash
+	}
+	mailbox Sent {
+		special_use = \Sent
+	}
+	mailbox "Sent Messages" {
+		special_use = \Sent
+	}
+}
+{# quota plugin most be loaded before protocols to enable import quota_grace in imap protocols #}
+{% if dovecot_quota_enable %}
+mail_plugins = $mail_plugins quota
+{% endif %}

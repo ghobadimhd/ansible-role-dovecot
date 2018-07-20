@@ -1,0 +1,17 @@
+# ANSIBLE GENERATED
+
+driver = {{ dovecot_sql_driver }}
+{% if dovecot_sql_driver == 'sqlite' %}
+connect = host={{ dovecot_sql_host }}
+{% else %}
+connect = host={{ dovecot_sql_host }} {% if dovecot_sql_port | default(False) -%}
+	port={{ dovecot_sql_port }}
+{%- endif %} dbname={{ dovecot_sql_database }} user={{ dovecot_sql_user }} password={{ dovecot_sql_password }} 
+{% if dovecot_sql_default_pass_scheme | default(False) %} 
+default_pass_scheme={{ dovecot_sql_default_pass_scheme }}
+{% endif %}
+{% endif %}
+
+user_query = {{ dovecot_sql_user_query | default('') }}
+password_query = {{ dovecot_sql_password_query | default('') }}
+iterate_query = {{ dovecot_sql_iterate_query | default('') }}

@@ -1,0 +1,60 @@
+{% if dovecot_quota_enable | default(False) %}
+{{ 'QUOTA' | comment }}
+
+plugin default_quota {
+	{% if dovecot_quota_driver == 'file' %}
+	quota = dict:User quota::file:~/Mail/dovecot-quota
+	{% elif dovecot_quota_driver == 'sql' %}
+	quota = dict:User quota::proxy::sqlquota
+	{% endif %}
+	quota_rule = *:storage={{ dovecot_quota_storage_limit | default('10M') }}:messages={{ dovecot_quota_messages_limit | default(1000) }}
+	quota_rule2 = Trash:storage=+10M:messages=+10
+}
+
+{% if dovecot_quota_driver == 'sql' %}
+dict sqlqouta {
+	sqlquota = {{ dovecot_sql_driver }}:{{ dovecot_quota_sql_conf_path }}
+}
+
+service dict {
+	unix_listener dict {
+		mode = 0666
+		user = dovecot
+		group = {{ dovecot_vmail_user }}
+	}
+}
+
+{% endif -%}
+
+{% if dovecot_quota_grace_enable | default(True) %}
+# QUOTA GRACE
+
+plugin default_quota_grace {
+    # 10% is the default
+    quota_grace = {{ dovecot_quota_grace_percent | default('10') }}%%
+    quota_status_success = DUNNO
+    quota_status_nouser = DUNNO
+    quota_status_overquota = "552 5.2.2 Mailbox is full"
+}
+
+# add line below to postfix smtpd_recipient_restrictions
+# to check quota befor delivery :
+# check_policy_service inet:localhost:{{ dovecot_quota_service_port }}
+
+{% endif -%}
+
+# QUOTA SERVICE
+
+{% if dovecot_quota_service_enable %}
+service quota-status {
+    executable = quota-status -p postfix
+    inet_listener {
+        port = {{ dovecot_quota_service_port }}
+        # You can choose any port you want
+    }
+    client_limit = {{ dovecot_quota_service_client_limit }}
+}
+
+{% endif %}
+
+{% endif -%}

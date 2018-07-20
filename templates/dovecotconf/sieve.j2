@@ -1,0 +1,18 @@
+{% if dovecot_sieve_enable %}
+{{ 'SIEVE' | comment }}
+{% if dovecot_managesieve_enable | default(False) %}
+protocols = $protocols sieve
+{% endif -%}
+{# FIXME:  sieve: failed to access user's Sieve script file:~/sieve;active=~/.dovecot.sieve (temporary failure) #}
+plugin default_sieve {
+	default_sieve = file:{{ dovecot_global_sieve_path }}
+	sieve = file:~/sieve;active=~/.dovecot.sieve
+
+{% if dovecot_managesieve_enable %}
+	sieve_max_script_size = {{ dovecot_sieve_script_max_size }}
+	sieve_quota_max_scripts = 0
+	sieve_quota_max_storage = 0
+{% endif %}
+}
+
+{% endif -%}

@@ -1,0 +1,27 @@
+{{ 'PROTOCOLS' | comment }}
+protocols =
+
+{% if dovecot_pop_enable | default(False) %}
+## POP3
+protocols = $protocols pop3
+
+{% endif -%}
+{% if dovecot_imap_enable | default(False) %}
+## IMAP
+protocols = $protocols imap
+
+protocol imap {
+	{% if dovecot_quota_enable %}
+		mail_plugins = $mail_plugins imap_quota
+	{% endif %}
+}
+
+{% endif -%}
+
+{% if (dovecot_managesieve_enable and dovecot_sieve_enable)  | default(False) %}
+## SIEVE
+# protocols = $protocols sieve
+protocol sieve {
+
+}
+{% endif -%}

@@ -1,0 +1,66 @@
+---
+# tasks file for ghobadimhd.dovecot
+
+- name: Load distribution specific variables
+  include_vars: "{{ ansible_distribution_file_variety }}.yml"
+
+- name: install dovecot
+  package:
+    state: present
+    name: "{{ dovecot_packages }}"
+
+- name: create virtual user
+  user:
+    name: "{{ dovecot_vmail_user }}"
+    shell: /usr/sbin/nologin
+    create_home: yes
+    home: "{{ dovecot_vmail_user_home }}"
+  register: vmail_user_info
+
+- name: configure dovecot
+  template:
+    src: dovecot.conf.j2
+    dest: "{{ dovecot_conf_path }}"
+  notify: restart dovecot
+
+- name: set proper permission
+  file:
+    path: "{{item}}"
+    state: directory
+    mode: "g+ws"
+  loop:
+    - "{{ dovecot_vmail_user_home }}"
+    - "/var/mail"
+
+- name: configure sql auth
+  template:
+    src: sql-conf.j2
+    dest: "{{ dovecot_sql_conf_path }}"
+  when: dovecot_sql_auth_enable
+  notify: restart dovecot
+
+- name: configure sql quota
+  template:
+    src: quota-sql-dict.j2
+    dest: "{{ dovecot_quota_sql_conf_path }}"
+  when: dovecot_quota_enable and dovecot_quota_driver == 'sql'
+  notify: restart dovecot
+
+- name: transfer and compile default sieve script
+  block:
+    - name: trasfering default sieve script
+      copy:
+        src: default.sieve
+        dest: "{{ dovecot_global_sieve_path }}"
+        mode: u=rw,g=rw,o=r
+
+    - name: "compile default sieve script"
+      command: "sievec {{ dovecot_global_sieve_path }}"
+      changed_when: False
+
+    - name: check permission of compiled sieve script
+      file:
+        state: file
+        path: "{{ dovecot_base_dir }}/{{dovecot_global_sieve_name}}.svbin"
+        mode: u=rw,g=r,o=r
+  when: dovecot_sieve_enable

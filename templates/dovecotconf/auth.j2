@@ -1,0 +1,56 @@
+{{ 'USER AND PASSWORD DATABASES' | comment }}
+{% if dovecot_local_auth_enable | default(True) %}
+# SYSTEM USERS
+{% if not dovecot_local_userdb_disable %}
+userdb default_passwd {
+    driver = passwd
+}
+
+{% endif -%}
+
+passdb default_pam {
+    driver = pam
+}
+
+{% endif -%}
+
+{% if dovecot_sql_auth_enable | default(False) %}
+# SQL USERS
+
+{% if not dovecot_sql_userdb_disable %}
+userdb default_sql {
+    driver = sql
+    args = {{ dovecot_sql_conf_path }}
+    default_fields = home={{ dovecot_vmail_user_home }}/%Ld/%Ln mail=mbox:~/Mail uid={{ vmail_user_info.uid }} gid={{ vmail_user_info.group }}
+}
+{% endif %}
+passdb default_sql {
+    driver = sql
+    args = /etc/dovecot/virtual-users-sql.conf 
+}
+
+{% endif -%}
+
+{% if dovecot_static_userdb_enable %}
+# STATIC USERDB
+
+userdb default_static {
+	driver = static
+	args = home={{ dovecot_vmail_user_home }}/%Ld/%Ln mail=mbox:~/Mail uid={{ vmail_user_info.uid }} gid={{ vmail_user_info.group }}
+}
+
+{% endif -%}
+
+{% if dovecot_auth_service_enable | default(False) %}
+# AUTH SERVICES
+
+service auth {
+	unix_listener {{ dovecot_auth_service_path | default('auth') }} {
+		mode = {{ dovecot_auth_service_mode | default('660') }}
+		user =  {{ dovecot_auth_service_group | default('dovecot') }}
+		group = {{ dovecot_auth_service_user | default('dovecot') }}
+
+	}
+}
+
+{% endif -%}
