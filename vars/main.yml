@@ -1,0 +1,14 @@
+# ---
+# # vars file for ghobadimhd.dovecot
+
+dovecot_base_dir: /etc/dovecot
+dovecot_conf_path: "{{ dovecot_base_dir }}/dovecot.conf"
+dovecot_custom_conf_path: "{{ dovecot_base_dir }}/dovecot.conf.local"
+dovecot_sql_conf_path: "{{ dovecot_base_dir }}/virtual-users-sql.conf"
+dovecot_quota_sql_conf_path: "{{ dovecot_base_dir }}/quota-dict-sql.conf"
+dovecot_global_sieve_name: "default"
+dovecot_global_sieve_path: "{{ dovecot_base_dir }}/{{dovecot_global_sieve_name}}.sieve"
+
+
+dovecot_vmail_user: vmail
+dovecot_vmail_user_home: /var/mail/virtual

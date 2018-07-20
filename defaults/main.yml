@@ -1,0 +1,67 @@
+---
+# defaults file for ghobadimhd.dovecot
+
+dovecot_local_auth_enable: yes
+dovecot_local_userdb_disable: no
+dovecot_pop_enable: yes
+dovecot_imap_enable: yes
+
+dovecot_ssl_enable: no
+dovecot_ssl_cert: /etc/ssl/certs/ssl-cert-snakeoil.pem
+dovecot_ssl_key: /etc/ssl/private/ssl-cert-snakeoil.key
+
+dovecot_sql_auth_enable: no
+dovecot_sql_userdb_disable: no
+dovecot_sql_driver: mysql
+dovecot_sql_host: localhost
+dovecot_sql_port: '3306'
+dovecot_sql_user: dovecot
+dovecot_sql_password: dovecot
+dovecot_sql_database: vmail
+dovecot_sql_user_query: SELECT home, uid, gid FROM users WHERE username = '%n' AND domain = '%d'
+dovecot_sql_password_query: SELECT username, domain, password FROM users WHERE username = '%n' AND domain = '%d'
+dovecot_sql_iterate_query: SELECT home, uid, gid FROM users WHERE username = '%n' AND domain = '%d'
+dovecot_sql_default_pass_scheme: PLAIN
+
+dovecot_static_userdb_enable: no
+dovecot_static_userdb_home: /var/mail/virtual/%Ld/%Ln
+dovecot_static_userdb_mail: "~/Mail"
+
+dovecot_auth_service_enable: no
+dovecot_auth_service_path: /var/spool/postfix/private/dovecot-auth
+# dovecot_auth_service_mode: 
+dovecot_auth_service_user: postfix
+dovecot_auth_service_group: postfix
+
+dovecot_lmtp_service_enable: no
+# dovecot_lmtp_postmaster: 
+dovecot_lmtp_service_path: /var/spool/postfix/private/dovecot-lmtp
+dovecot_lmtp_service_mode: "0660"
+dovecot_lmtp_service_user: dovecot
+dovecot_lmtp_service_group: postfix
+
+dovecot_quota_enable: no
+dovecot_quota_driver: file
+
+dovecot_quota_storage_limit: 10M
+dovecot_quota_messages_limit: 1000
+
+dovecot_quota_sql_path: /etc/dovecot/quota-dict.conf
+dovecot_quota_sql_driver: mysql
+dovecot_quota_sql_host: localhost
+dovecot_quota_sql_user: dovecot
+dovecot_quota_sql_password: dovecot
+dovecot_quota_sql_database: vmail
+dovecot_quota_sql_table: quota
+
+# default : enable if dovecot quota enabled
+# dovecot_quota_grace_enable: yes
+dovecot_quota_grace_percent: 10
+
+dovecot_quota_service_enable: yes
+dovecot_quota_service_port: 12302
+dovecot_quota_service_client_limit: 1
+
+dovecot_sieve_enable: no
+dovecot_managesieve_enable: yes
+dovecot_sieve_script_max_size: 1M

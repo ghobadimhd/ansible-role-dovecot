@@ -1,0 +1,9 @@
+dovecot_packages:
+  - dovecot-core
+  - dovecot-lmtpd
+  - dovecot-imapd
+  - dovecot-pop3d
+  - dovecot-mysql
+  - dovecot-ldap
+  - dovecot-sieve
+  - dovecot-managesieved
