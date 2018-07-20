@@ -1,0 +1,20 @@
+# NAMESPACES
+{% for namespace in  dovecot_custom.namespaces | default([])  %}
+{# FIXME: CANNOT GET name from namespace (list of ) #}
+namespace {{ namespace | get_item('name','') }} {
+{% for setting, value in namespace | default([])  | dictlist2items %}
+{% if not (setting == 'mailboxes' or setting == 'name' ) %}
+	{{ setting }} = {{ value }}
+{% endif %}
+{% endfor %}
+{% for mailbox in namespace| get_item('mailboxes', []) %}
+	mailbox {{ mailbox | get_item('name')  }} {
+	{% for setting, value in mailbox | default([]) | dictlist2items %}
+	{% if setting != 'name' %}
+		{{ setting }} = {{ value }}
+	{% endif %}
+	{% endfor %}
+	}
+{% endfor %}
+}
+{% endfor %}

@@ -1,0 +1,10 @@
+# DICTIONARIES
+{% for dict in dovecot_custom.dicts | default([]) %}
+dict {{ dict | get_item('name', '') }} {
+	{% for setting, value in dict | default([]) | dictlist2items %}
+	{% if setting != 'name' %}
+	{{ setting }} = {{ value }}
+	{% endif %}
+	{% endfor %}
+}
+{% endfor %}

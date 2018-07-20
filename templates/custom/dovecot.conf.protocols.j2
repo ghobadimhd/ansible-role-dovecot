@@ -1,0 +1,8 @@
+# PROTOCOLS 
+{% for  protocol in dovecot_custom.protocols | default([]) %}
+protocol {{ protocol | dict_key }} {
+	{% for setting, value in protocol | dict_value | dictlist2items  %}
+	{{ setting }} = {{ value }}
+	{% endfor %}
+}
+{% endfor %}

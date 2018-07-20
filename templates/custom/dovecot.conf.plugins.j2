@@ -1,0 +1,10 @@
+# PLUGINS
+{% for plugin in dovecot_custom.plugins | default([]) %}
+plugin {{ plugin | get_item('name', '') }} {
+	{% for setting, value in plugin | default({}) | dictlist2items %}
+	{% if setting != 'name' %}
+	{{ setting }} = {{ value }}
+	{% endif %}
+	{% endfor %}
+}
+{% endfor %}

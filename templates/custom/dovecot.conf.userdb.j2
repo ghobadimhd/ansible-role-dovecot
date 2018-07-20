@@ -1,0 +1,24 @@
+# USER DATABASES
+{% for userdb in  dovecot_custom.userdb | default([]) %}
+userdb {{ userdb.name | default('') }} {
+    driver = {{ userdb.driver | mandatory }}
+{% if userdb.args | default(False) or  userdb.args_kv | default(False) %}
+    args = {% for setting, value in userdb.args_kv  | default({}) | dictlist2items -%} 
+        {{ setting }}= {{- value }} {% endfor %}
+        {%- for item in (userdb.args| default([]) ) %}{{- item }} {% endfor %}
+{%- endif %}
+{% if userdb.default_fields | default(False) or userdb.default_fields_kv | default(False) %}
+    default_fields = {% for setting, value in userdb.default_fields_kv | default([]) | dictlist2items -%} 
+        {{ setting }}= {{- value }} {% endfor %}
+        {%- for item in userdb.default_fields | default([]) %}{{- item }} {% endfor %}
+{%- endif %}
+{% if userdb.override_fields | default(False) or  userdb.override_fields_kv | default(False) %}
+    override_fields = {% for setting, value in userdb.override_fields_kv | default([]) | dictlist2items -%} 
+        {{- setting }}= {{- value }} {% endfor %}
+        {%- for item in userdb.override_fields | default([]) %}{{ item }} {% endfor %}
+{%- endif %}
+{% for setting in userdb.settings | default([]) | dictlist2items  %}
+    {{ setting }} = {{ value }}
+{%- endfor %}
+}
+{% endfor %}

@@ -1,0 +1,37 @@
+# SERVICES
+{% for service in  dovecot_custom.services | default([])  %}
+service {{ service | dict_key }} {
+{% for setting, value in service | dict_value | dictlist2items %}
+{% if setting not in ['name', 'inet_listeners', 'unix_listeners', 'fifo_listeners'] %}
+	{{ setting }} = {{ value }}
+{% endif %}
+{% endfor %}
+{% for listener in service | dict_value | get_item('inet_listeners', []) %}
+	inet_listener {{ listener | get_item('name') }} {
+	{% for setting, value in listener | dictlist2items %}
+		{% if setting != 'name' %}
+		{{ setting }} = {{ value }}
+		{% endif %}
+	{% endfor %}
+	}
+{% endfor %}
+{% for listener in service | dict_value | get_item('fifo_listeners', []) %}
+	fifo_listener {{ listener | get_item('name') }} {
+	{% for setting, value in listener | dictlist2items %}
+		{% if setting != 'name' %}
+		{{ setting }} = {{ value }}
+		{% endif %}
+	{% endfor %}
+	}
+{% endfor %}
+{% for listener in service | dict_value | get_item('unix_listeners', []) %}
+	unix_listener {{ listener | get_item('name') }} {
+	{% for setting, value in listener | dictlist2items %}
+		{% if setting != 'name' %}
+		{{ setting }} = {{ value }}
+		{% endif %}
+	{% endfor %}
+	}
+{% endfor %}
+}
+{% endfor %}

@@ -1,0 +1,17 @@
+# ANSIBLE GENERATED
+
+driver = {{ item.driver }}
+{% if item.driver == 'sqlite' %}
+connect = host={{ item.host }}
+{% else %}
+connect = host={{ item.host }} {% if item.port | default(False) -%}
+	port={{ item.port }}
+{%- endif %} dbname={{ item.database }} user={{ item.user }} password={{ item.password }} 
+{% if item.default_pass_scheme | default(False) %} 
+default_pass_scheme={{ item.default_pass_scheme }}
+{% endif %}
+{% endif %}
+
+user_query = {{ item.user_query | default('') }}
+password_query = {{ item.password_query | default('') }}
+iterate_query = {{ item.iterate_query | default('') }}

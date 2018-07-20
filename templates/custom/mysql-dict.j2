@@ -1,0 +1,22 @@
+#jinja2: lstrip_blocks: True
+# ANSIBLE GENERATED
+
+connect = host={{ item.host }} {% if item.port | default(False) %}
+	port ={{ item.port }}
+{%- endif %} dbname={{ item.database }} user={{ item.user }} password={{ item.password }} 
+
+{% for map in ( item.maps | default([]) ) %}
+map {
+	{% for setting, value in map | default([]) | dictlist2items  %}
+	{% if setting != 'fields' %}
+	{{ setting }} = {{ value }}
+	{% else %}
+	fields {
+	{% for setting in map[setting] | default([]) | dictlist2items  %}
+		{{ setting }} = {{ value }}
+	{% endfor %}
+	}
+	{% endif %}
+	{% endfor %}
+}
+{% endfor %}

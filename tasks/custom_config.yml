@@ -1,0 +1,22 @@
+---
+# dovecot custom configurations
+
+- name: configure dovecot.conf.local
+  template:
+    src: custom/dovecot.conf.j2
+    dest: "{{ dovecot_custom_conf_path }}"
+  notify: restart dovecot
+
+- name: configure sql drivers
+  template:
+    src: custom/mysql-conf.j2
+    dest: "{{ dovecot_base_dir }}/{{ item.name }}.conf"
+  with_items: "{{ sql_drivers | default([]) }}"
+  notify: restart dovecot
+
+- name: configure sql dictionaries
+  template:
+    src: custom/mysql-dict.j2
+    dest: "{{ dovecot_base_dir }}/{{ item.name }}.conf"
+  with_items: "{{ dovecot_custom.sql_dicts | default([]) }}"
+  notify: restart dovecot

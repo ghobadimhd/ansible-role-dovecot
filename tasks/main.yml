@@ -64,3 +64,8 @@
         path: "{{ dovecot_base_dir }}/{{dovecot_global_sieve_name}}.svbin"
         mode: u=rw,g=r,o=r
   when: dovecot_sieve_enable
+
+# Custom config
+- name: Deploy custom configurations
+  include_tasks: custom_config.yml
+  when: dovecot_custom_config_enable | default(False)
